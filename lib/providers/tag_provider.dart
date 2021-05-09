@@ -62,6 +62,9 @@ class TagProvider with ChangeNotifier {
   Future<int> exist(String parent, String name, [bool create = false]) async {
     bool _exist = false;
     int _id = -1;
+    if (parent.isEmpty || name.isEmpty) {
+      return -1;
+    }
     for (int i = 0; i < _tags.length; i++) {
       if (_tags[i].name == name && _tags[i].parent == parent) {
         _id = _tags[i].id;

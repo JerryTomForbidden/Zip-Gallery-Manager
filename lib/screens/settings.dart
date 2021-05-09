@@ -14,6 +14,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   Future<void>? _futurePref;
+  bool _scanFolders = false;
 
   @override
   void initState() {
@@ -51,7 +52,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         )
                       : ListTile(
                           title: Text('Select your path'),
-                          subtitle: Text(pref.path),
+                          subtitle: Text(
+                            pref.path.isEmpty
+                                ? '<no path selected>'
+                                : pref.path,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           onTap: () async {
                             final p = await _selectFolder();
                             await pref.setPath(p!);
@@ -59,8 +66,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         );
                 },
               ),
-              ListTile(
-                title: Text('Ignore non-archive files'),
+              SwitchListTile(
+                title: Text('Scan folders as gallery'),
+                subtitle: Text(
+                  'Only direct pictures will be scanned. No subfolder scan.',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                value: pref.scanFolders,
+                onChanged: (value) {
+                  setState(() {
+                    _scanFolders = value;
+                    pref.setScanFolders(value);
+                  });
+                },
+              ),
+              SwitchListTile(
+                title: Text('Only allow archive files'),
+                subtitle: Text('(zip, rar, *.gz, ...)'),
+                value: pref.onlyArchiveFiles,
+                onChanged: null,
               )
             ],
           );

@@ -6,11 +6,8 @@ import 'package:sqflite/sqflite.dart' as sql;
 import 'package:path/path.dart' as path;
 
 class DBHelper {
-  static String _createString = """
+  /*static String _createString = """
     --
-    -- Fichier généré par SQLiteStudio v3.2.1 sur sam. avr. 17 12:14:19 2021
-    --
-    -- Encodage texte utilisé : UTF-8
     --
     PRAGMA foreign_keys = off;
     BEGIN TRANSACTION;
@@ -30,12 +27,12 @@ class DBHelper {
     COMMIT TRANSACTION;
     PRAGMA foreign_keys = on;
 
-  """;
+  """;*/
 
   static List<String> _createList = [
     "CREATE TABLE Galleries (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name TEXT NOT NULL, path TEXT NOT NULL);",
     "CREATE TABLE GalleriesTags (galleryId INT REFERENCES Galleries (id) NOT NULL, tagId INT REFERENCES Tags (id) NOT NULL, UNIQUE (galleryId, tagId));",
-    "CREATE TABLE ParentTags (name TEXT PRIMARY KEY ASC NOT NULL);",
+    "CREATE TABLE ParentTags (name TEXT PRIMARY KEY ASC NOT NULL, color TEXT NOT NULL);",
     "CREATE TABLE Tags (parent TEXT REFERENCES ParentTags (name) NOT NULL, name TEXT NOT NULL, id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, UNIQUE (parent, name));",
   ];
 
@@ -63,7 +60,7 @@ class DBHelper {
   """;
 
   static String _getAllParentTags = """
-  SELECT name as parent
+  SELECT name as parent, color
   FROM ParentTags
   """;
 

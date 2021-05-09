@@ -21,7 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print('init home screen');
 
     /*WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
       print('defining futures (home screen)');
@@ -34,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('build');
     _futureTp = Provider.of<TagProvider>(context, listen: false).initialize();
     _futureGp =
         Provider.of<GalleryProvider>(context, listen: false).initialize();
@@ -46,10 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: MyDrawer(),
       body: Consumer3<GalleryProvider, TagProvider, PrefProvider>(
         builder: (context, galleryProvider, tagProvider, prefProvider, child) {
-          print('in consumer gp : ${galleryProvider.initialized}');
-
-          if (galleryProvider.pathHaveChanged!) {
-            print('path changed');
+          if (galleryProvider.pathHaveChanged) {
             return FutureBuilder(
               future: Future.wait([_futureTp!, _futureGp!]),
               builder: (context, snapshot) {
@@ -75,10 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Text("NOT TAGGED",
                 style: TextStyle(fontWeight: FontWeight.bold))),
         ...gp.nonTagged.map((e) => GalleryItem(gallery: e)),
+        Divider(),
         ListTile(
             title:
                 Text("TAGGED", style: TextStyle(fontWeight: FontWeight.bold))),
-        ...gp.galleries.map((e) => GalleryItem(gallery: e))
+        ...gp.galleries.map((e) => GalleryItem(gallery: e)),
+        Divider(),
       ],
     );
   }

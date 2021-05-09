@@ -30,13 +30,26 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<PrefProvider, GalleryProvider>(
           update: (context, pref, previousGallery) {
             print('updated gallery provider : ${previousGallery!.initialized}');
-            return previousGallery.initialized
-                ? previousGallery
-                : GalleryProvider(path: pref.path, pathHaveChanged: true);
+            GalleryProvider gp = GalleryProvider(
+                path: pref.path,
+                pathHaveChanged: true,
+                onlyArchiveFiles: pref.onlyArchiveFiles,
+                scanFolders: pref.scanFolders);
+            if (previousGallery.initialized) {
+              gp.initialized = true;
+              gp.didLoad = previousGallery.didLoad;
+              gp.galleries = previousGallery.galleries;
+              gp.nonTagged = previousGallery.nonTagged;
+            }
+            return gp;
           },
           create: (context) {
             print('on Create gallery provider');
-            return GalleryProvider(path: '', pathHaveChanged: false);
+            return GalleryProvider(
+                path: '',
+                pathHaveChanged: false,
+                onlyArchiveFiles: true,
+                scanFolders: false);
           },
         ),
         ChangeNotifierProxyProvider<PrefProvider, TagProvider>(
@@ -58,14 +71,14 @@ class MyApp extends StatelessWidget {
             accentColor: Colors.deepOrange,
             fontFamily: 'GoogleProductSans',
             textTheme: TextTheme(
-                headline1:
-                    TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-                headline6: TextStyle(
-                  fontSize: 24.0,
-                ),
-                subtitle2: TextStyle(
-                  fontSize: 10.0,
-                )),
+              headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+              headline6: TextStyle(
+                fontSize: 24.0,
+              ),
+              subtitle2: TextStyle(
+                fontSize: 10.0,
+              ),
+            ),
             canvasColor: Color.fromRGBO(254, 253, 250, 1),
           ),
           home: pref.loaded

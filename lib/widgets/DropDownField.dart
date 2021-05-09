@@ -215,6 +215,7 @@ class DropDownField extends FormField<String> {
           builder: (FormFieldState<String> field) {
             final DropDownFieldState state = field as DropDownFieldState;
             final ScrollController _scrollController = ScrollController();
+            //final FocusNode _focusNode = FocusNode();
             final InputDecoration effectiveDecoration = InputDecoration(
                 border: InputBorder.none,
                 filled: true,
@@ -227,6 +228,7 @@ class DropDownField extends FormField<String> {
                         size: 20.0,
                         color: Colors.black),
                     onPressed: () {
+                      //if (_focusNode.hasFocus)
                       SystemChannels.textInput.invokeMethod('TextInput.hide');
                       state.setState(() {
                         state._showdropdown = !state._showdropdown;
@@ -244,7 +246,7 @@ class DropDownField extends FormField<String> {
                   children: <Widget>[
                     Expanded(
                       child: TextFormField(
-                        autovalidate: true,
+                        autovalidateMode: AutovalidateMode.always,
                         controller: state._effectiveController,
                         decoration: effectiveDecoration.copyWith(
                             errorText: field.errorText),
@@ -252,7 +254,8 @@ class DropDownField extends FormField<String> {
                         textAlign: TextAlign.start,
                         autofocus: false,
                         obscureText: false,
-                        maxLengthEnforced: true,
+                        maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                        //focusNode: _focusNode,
                         maxLines: 1,
                         validator: (String? newValue) {
                           if (required) {

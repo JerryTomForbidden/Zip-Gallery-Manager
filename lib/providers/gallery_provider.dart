@@ -13,10 +13,25 @@ class GalleryProvider with ChangeNotifier {
   List<Gallery> _galleries = [];
   List<Gallery> _nonTagged = [];
 
-  final bool? pathHaveChanged;
-  final String? path;
+  final bool pathHaveChanged;
+  final String path;
+  final bool scanFolders;
+  final bool onlyArchiveFiles;
 
-  GalleryProvider({@required this.path, @required this.pathHaveChanged}) {}
+  GalleryProvider({
+    required this.path,
+    required this.pathHaveChanged,
+    required this.scanFolders,
+    required this.onlyArchiveFiles,
+  });
+
+  set galleries(List<Gallery> g) {
+    _galleries = g;
+  }
+
+  set nonTagged(List<Gallery> nt) {
+    _nonTagged = nt;
+  }
 
   List<Gallery> get galleries {
     return [..._galleries];
@@ -45,7 +60,7 @@ class GalleryProvider with ChangeNotifier {
   Future<int> initialize() async {
     List<Gallery> _newGalleries = [];
     List<FileSystemEntity> res = [];
-    if (path!.isEmpty) {
+    if (path.isEmpty) {
       return -1;
     }
     try {
@@ -54,7 +69,7 @@ class GalleryProvider with ChangeNotifier {
       final ntg = await DBHelper.getAllNonTaggedGalleries();
 
       await for (var file
-          in Directory(path!).list(recursive: false, followLinks: false)) {
+          in Directory(path).list(recursive: false, followLinks: false)) {
         final String fname =
             file.path.substring(file.path.lastIndexOf('/') + 1);
 
@@ -62,13 +77,19 @@ class GalleryProvider with ChangeNotifier {
         //check si on a une extension et qu'on est pas un fichier/dossier caché
         if (fname.lastIndexOf('.') > 0) {
           final String ext = fname.substring(fname.lastIndexOf('.') + 1);
-          if (['zip', 'rar', 'gz'].contains(ext)) {
+          //TODO regexp cause we need to ensure that we're at end of fname
+          if (onlyArchiveFiles) {
+            if (['zip', 'rar', 'gz'].contains(ext))
+              proceed = true;
+            else
+              proceed = false;
+          } else
             proceed = true;
-          }
         } else {
           //si pas d'ext probablement un dossier ou un fichier sans extension (peut etre une archive)
           //dart:io pour determiner exactement
-          proceed = true;
+          print('scc $scanFolders');
+          if (scanFolders) proceed = true;
         }
 
         if (!proceed) continue;
