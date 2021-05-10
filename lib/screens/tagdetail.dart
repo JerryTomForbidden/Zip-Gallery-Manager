@@ -10,7 +10,6 @@ class TagDetailScreen extends StatelessWidget {
   static String routeName = '/tag-detail';
 
   Future<void> _deleteThisParentTag(BuildContext context) async {
-    print('on _delete');
     Navigator.of(context).pop();
   }
 
@@ -30,7 +29,8 @@ class TagDetailScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: Icon(Icons.delete),
-            onPressed: () {
+            onPressed:
+                null, /*() {
               showDialog(
                 context: context,
                 builder: (context) {
@@ -55,7 +55,7 @@ class TagDetailScreen extends StatelessWidget {
                   );
                 },
               );
-            },
+            },*/
           )
         ],
       ),

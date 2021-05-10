@@ -8,7 +8,7 @@
       "name": "exzip_manager",
       "request": "launch",
       "type": "dart",
-      "flutterMode": "release"
+      "flutterMode": "debug"
     }
   ]
 }

@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Awesome App'),
+        title: Text('Home'),
       ),
       drawer: MyDrawer(),
       body: Consumer3<GalleryProvider, TagProvider, PrefProvider>(

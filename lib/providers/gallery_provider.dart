@@ -88,7 +88,6 @@ class GalleryProvider with ChangeNotifier {
         } else {
           //si pas d'ext probablement un dossier ou un fichier sans extension (peut etre une archive)
           //dart:io pour determiner exactement
-          print('scc $scanFolders');
           if (scanFolders) proceed = true;
         }
 
