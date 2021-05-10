@@ -1,4 +1,4 @@
-package com.example.exzip_manager
+package com.jerrytomforbidden.exzip_manager
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -105,7 +105,6 @@ class DropDownFieldState extends FormFieldState<String> {
   }
 
   List<ListTile> _getChildren(List<String> items) {
-    print('items length = ${items.length} ! $items ** $_searchText');
     List<ListTile> childItems = [];
     for (var item in items) {
       if (_searchText.isNotEmpty) {
