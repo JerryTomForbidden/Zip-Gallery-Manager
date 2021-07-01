@@ -115,7 +115,7 @@ class GalleryProvider with ChangeNotifier {
       _galleries = [...tg];
       _nonTagged = [...ntg, ..._newGalleries];
       initialized = true;
-
+      //pathHaveChanged = false;
       notifyListeners();
       return res.length;
     } catch (e) {
@@ -127,6 +127,8 @@ class GalleryProvider with ChangeNotifier {
   Future<int> tagGallery(int galleryId, int tagId) async {
     try {
       //TODO: Check first if gallery exist in provider!
+      //TODO: which OP should we do first (DataBase? ProviderClass?)
+      //TODO: Provider first (check if gallery exist on tagged or non-tagged, then DataBase, and add to tagged)
       int id = await DBHelper.insert("GalleriesTags", {
         "galleryId": galleryId,
         "tagId": tagId,
@@ -135,7 +137,7 @@ class GalleryProvider with ChangeNotifier {
       //success
       if (id > 0) {
         final Tag tag = (await DBHelper.getTag(tagId))!;
-        // si l'element est présent dans les tagged
+        // if it is inside tagged array, we add the tag to its list
         if (_galleries
                 .where((element) => element.id == galleryId)
                 .firstOrNull !=

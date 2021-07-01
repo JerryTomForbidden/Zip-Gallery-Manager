@@ -12,7 +12,7 @@ class TagProvider with ChangeNotifier {
   }
 
   List<String> get parents {
-    Set<String>? _set = Set();
+    Set<String> _set = Set();
     this.tags.forEach((element) {
       _set.add(element.parent);
     });
@@ -20,7 +20,7 @@ class TagProvider with ChangeNotifier {
   }
 
   List<String> getChildrenOfParent(String parent) {
-    Set<String>? _set = Set();
+    Set<String> _set = Set();
     this.tags.forEach((element) {
       if (element.parent == parent) {
         _set.add(element.name);

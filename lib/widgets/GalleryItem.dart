@@ -6,14 +6,29 @@ import 'package:flutter/material.dart';
 
 class GalleryItem extends StatelessWidget {
   final Gallery gallery;
+  List<TextSpan>? highlightName;
 
-  const GalleryItem({
+  GalleryItem({
     Key? key,
     required this.gallery,
+    this.highlightName,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final text = (highlightName != null)
+        ? RichText(
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            text: TextSpan(
+                style: Theme.of(context).textTheme.caption,
+                children: highlightName))
+        : Text(
+            gallery.name,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          );
+
     return Card(
       color: gallery.tags.length > 0 ? Colors.green[50] : Colors.red[50],
       elevation: 0,
@@ -26,11 +41,7 @@ class GalleryItem extends StatelessWidget {
               fit: BoxFit.fill,
               height: 40,
             ),
-            title: Text(
-              gallery.name,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
+            title: text,
             onTap: () {
               Navigator.of(context)
                   .pushNamed(GalleryDetailScreen.routeName, arguments: gallery);

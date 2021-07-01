@@ -100,7 +100,7 @@ class DBHelper {
     }
   }
 
-  // un problème avec cett fonction
+  // TODO: rewrite this mess
   static Future<List<Gallery>> getAllTaggedGalleries() async {
     final sqldb = await initialize();
     // Get all galleries that are tagged
@@ -147,19 +147,22 @@ class DBHelper {
   }
 
   static Future<List<Gallery>> getAllNonTaggedGalleries() async {
-    final sqldb = await initialize();
-    // Get all galleries that are tagged
     List<Gallery> res = [];
-    final g = await sqldb.rawQuery(_getAllNonTaggedGalleries);
-    g.forEach((element) {
-      res.add(Gallery(
-          id: element['id'] as int,
-          name: element['name'] as String,
-          path: element['path'] as String,
-          tags: []));
-    });
-    await sqldb.close();
-    return res;
+    try {
+      final sqldb = await initialize();
+      final g = await sqldb.rawQuery(_getAllNonTaggedGalleries);
+      g.forEach((element) {
+        res.add(Gallery(
+            id: element['id'] as int,
+            name: element['name'] as String,
+            path: element['path'] as String,
+            tags: []));
+      });
+      await sqldb.close();
+      return res;
+    } catch (e) {
+      return res;
+    }
   }
 
   static Future<List<Tag>> getAlltags() async {
@@ -168,7 +171,7 @@ class DBHelper {
       final sqldb = await initialize();
 
       final tags = await sqldb.rawQuery(_getAllTags);
-
+      await sqldb.close();
       for (int i = 0; i < tags.length; i++) {
         res.add(Tag(
             id: tags[i]['id'] as int,
@@ -187,14 +190,19 @@ class DBHelper {
                       FROM Tags
                       WHERE Tags.id = $tagId
                       """;
-    final sqldb = await initialize();
-    final tags = await sqldb.rawQuery(_getTag);
-    if (tags.first.isNotEmpty) {
-      return Tag(
-          id: tags.first['id'] as int,
-          name: tags.first['name'] as String,
-          parent: tags.first['parent'] as String);
-    } else
+    try {
+      final sqldb = await initialize();
+      final tags = await sqldb.rawQuery(_getTag);
+      await sqldb.close();
+      if (tags.first.isNotEmpty) {
+        return Tag(
+            id: tags.first['id'] as int,
+            name: tags.first['name'] as String,
+            parent: tags.first['parent'] as String);
+      } else
+        return null;
+    } catch (e) {
       return null;
+    }
   }
 }
