@@ -1,3 +1,4 @@
+import 'package:exzip_manager/models/gallery.dart';
 import 'package:exzip_manager/models/tag.dart';
 import 'package:exzip_manager/providers/gallery_provider.dart';
 import 'package:exzip_manager/providers/pref_provider.dart';
@@ -112,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 margin: EdgeInsets.symmetric(horizontal: 24.0, vertical: 45.0),
                 child: TextFormField(
                   controller: _searchController,
-                  decoration: InputDecoration(),
+                  decoration: InputDecoration(fillColor: Colors.white),
                 ),
               )
             : Text('Home'),
@@ -158,74 +159,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget buildHomeGalleryList(
       GalleryProvider gp, Function _refresh, bool searchMode) {
-    List<GalleryItem> searchResult = [];
-    if (searchMode) {
-      [...gp.galleries, ...gp.nonTagged].forEach((element) {
-        bool isValid = true;
-        for (int i = 0; i < _searchTags.length; i++) {
-          bool tagFound = false;
-          for (int j = 0; j < element.tags.length; j++) {
-            if (element.tags[j].name == _searchTags[i].name &&
-                element.tags[j].parent == _searchTags[i].parent) {
-              tagFound = true;
-            }
-          }
-
-          if (!tagFound) {
-            isValid = false;
-            break;
-          } else
-            continue;
-        }
-        if (isValid) {
-          if (_searchKeys.length > 0) {
-            RegExp rx = RegExp(
-                "(" + _searchKeys.join('|').trim().toLowerCase() + ")",
-                multiLine: true);
-            if (rx.allMatches(element.name.toLowerCase()).length > 0) {
-              final posToHighlights = rx
-                  .allMatches(element.name.toLowerCase())
-                  .map((e) => [e.start, e.end])
-                  .toList();
-
-              int lastPos = 0;
-              List<TextSpan> formattedName = [];
-              //Highlighting the name
-              for (int i = 0; i < posToHighlights.length; i++) {
-                final p = posToHighlights[i];
-                if (p[0] == 0) {
-                  formattedName.add(TextSpan(
-                    text: element.name.substring(p[0], p[1]),
-                    style: TextStyle(backgroundColor: Colors.yellow),
-                  ));
-                } else {
-                  formattedName.add(
-                      TextSpan(text: element.name.substring(lastPos, p[0])));
-                  formattedName.add(TextSpan(
-                    text: element.name.substring(p[0], p[1]),
-                    style: TextStyle(backgroundColor: Colors.yellow),
-                  ));
-                }
-                lastPos = p[1];
-
-                if (i == posToHighlights.length - 1 &&
-                    p[1] != element.name.length) {
-                  formattedName.add(TextSpan(
-                      text: element.name
-                          .substring(lastPos, element.name.length)));
-                }
-              }
-              searchResult.add(GalleryItem(
-                gallery: element,
-                highlightName: formattedName,
-              ));
-            }
-          } else if (_searchTags.length > 0) {
-            searchResult.add(GalleryItem(gallery: element));
-          }
-        }
-      });
-    }
     return RefreshIndicator(
       onRefresh: () => _refresh(),
       child: searchMode
@@ -238,7 +171,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
-                ...searchResult,
+                ...filterSearchResult(_searchTags, _searchKeys,
+                    [...gp.galleries, ...gp.nonTagged])
               ],
             )
           : ListView(
@@ -258,4 +192,74 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
     );
   }
+}
+
+List<GalleryItem> filterSearchResult(
+    List<Tag> _searchTags, List<String> _searchKeys, List<Gallery> galleries) {
+  List<GalleryItem> searchResult = [];
+  galleries.forEach((element) {
+    bool isValid = true;
+    for (int i = 0; i < _searchTags.length; i++) {
+      bool tagFound = false;
+      for (int j = 0; j < element.tags.length; j++) {
+        if (element.tags[j].name == _searchTags[i].name &&
+            element.tags[j].parent == _searchTags[i].parent) {
+          tagFound = true;
+        }
+      }
+
+      if (!tagFound) {
+        isValid = false;
+        break;
+      } else
+        continue;
+    }
+    if (isValid) {
+      if (_searchKeys.length > 0) {
+        RegExp rx = RegExp(
+            "(" + _searchKeys.join('|').trim().toLowerCase() + ")",
+            multiLine: true);
+        if (rx.allMatches(element.name.toLowerCase()).length > 0) {
+          final posToHighlights = rx
+              .allMatches(element.name.toLowerCase())
+              .map((e) => [e.start, e.end])
+              .toList();
+
+          int lastPos = 0;
+          List<TextSpan> formattedName = [];
+          //Highlighting the name
+          for (int i = 0; i < posToHighlights.length; i++) {
+            final p = posToHighlights[i];
+            if (p[0] == 0) {
+              formattedName.add(TextSpan(
+                text: element.name.substring(p[0], p[1]),
+                style: TextStyle(backgroundColor: Colors.yellow),
+              ));
+            } else {
+              formattedName
+                  .add(TextSpan(text: element.name.substring(lastPos, p[0])));
+              formattedName.add(TextSpan(
+                text: element.name.substring(p[0], p[1]),
+                style: TextStyle(backgroundColor: Colors.yellow),
+              ));
+            }
+            lastPos = p[1];
+
+            if (i == posToHighlights.length - 1 &&
+                p[1] != element.name.length) {
+              formattedName.add(TextSpan(
+                  text: element.name.substring(lastPos, element.name.length)));
+            }
+          }
+          searchResult.add(GalleryItem(
+            gallery: element,
+            highlightName: formattedName,
+          ));
+        }
+      } else if (_searchTags.length > 0) {
+        searchResult.add(GalleryItem(gallery: element));
+      }
+    }
+  });
+  return searchResult;
 }
